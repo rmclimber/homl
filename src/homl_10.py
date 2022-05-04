@@ -34,4 +34,6 @@ model = keras.models.Sequential()
 model.add(keras.layers.Flatten(input_shape=img_dims))
 model.add(keras.layers.Dense(300, activation='relu'))
 model.add(keras.layers.Dense(300, activation='relu'))
-model.add(keras.layers.Dense(10, activaiton='softmax'))
+model.add(keras.layers.Dense(10, activation='softmax'))
+
+print(model.summary())
