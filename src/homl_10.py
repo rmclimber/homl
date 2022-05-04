@@ -24,6 +24,7 @@ print("Image dimensions: {}".format(img_dims))
 # scale pixel intensities and set aside first 5000 samples as validation set
 X_val, X_train = divide_by_255(X_train_full[:5000]), divide_by_255(X_train_full[5000:])
 y_val, y_train = divide_by_255(y_train_full[:5000]), divide_by_255(y_train_full[5000:])
+print(X_train.shape)
 
 
 class_Names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal',
@@ -37,3 +38,16 @@ model.add(keras.layers.Dense(300, activation='relu'))
 model.add(keras.layers.Dense(10, activation='softmax'))
 
 print(model.summary())
+print(model.layers)
+print(model.layers[1].get_weights())
+
+## COMPILE MODEL
+model.compile(loss="sparse_categorical_crossentropy",
+              optimizer="sgd",
+              metrics=["accuracy"])
+
+exit()
+
+## TRAIN MODEL
+history = model.fit(X_train, y_train, epochs=30,
+                    validation_data=(X_val, y_val))
