@@ -7,6 +7,9 @@ Other credits to: Aurélien Géron (author of HOML)
 
 import tensorflow as tf
 import tensorflow.keras as keras
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 # method definitions
 def divide_by_255(data):
@@ -27,7 +30,7 @@ y_val, y_train = y_train_full[:5000], y_train_full[5000:]
 print(X_train.shape)
 
 
-class_Names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal',
+class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat', 'Sandal',
                'Shirt', 'Sneaker', 'Bag', 'Ankle boot']
 
 ## PREPARE MODEL
@@ -49,3 +52,31 @@ model.compile(loss="sparse_categorical_crossentropy",
 ## TRAIN MODEL
 history = model.fit(X_train, y_train, epochs=30,
                     validation_data=(X_val, y_val))
+
+# if not satisfied with performance, can all fit() again
+
+## EXAMINE history
+print(history.params)
+print(history.epoch)
+
+## PLOT HISTORY
+plt.close()
+pd.DataFrame(history.history).plot(figsize=(0, 5))
+plt.grid(True)
+plt.gca().set_ylim(0, 1) # set vertical range to [0-1]
+plt.show()
+plt.close()
+
+## EVALUATE MODEL
+model.evaluate(Xtest, ytest)
+
+## MAKE PREDICTIONS
+X_new = Xtest[:3]
+y_proba = model.predict(X_new)
+y_proba.round(2)
+
+y_pred = model.predict_classes(X_new)
+print(y_pred)
+print(np.array(class_names)[y_pred])
+y_new = ytest[:3]
+print(y_new)
