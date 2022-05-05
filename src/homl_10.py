@@ -60,21 +60,25 @@ print(history.params)
 print(history.epoch)
 
 ## PLOT HISTORY
+print('PLOTTING')
 plt.close()
 pd.DataFrame(history.history).plot(figsize=(0, 5))
 plt.grid(True)
 plt.gca().set_ylim(0, 1) # set vertical range to [0-1]
 plt.show()
-plt.close()
+# plt.close()
 
 ## EVALUATE MODEL
+print('EVALUATE')
 model.evaluate(Xtest, ytest)
 
 ## MAKE PREDICTIONS
+print('PREDICT')
 X_new = Xtest[:3]
 y_proba = model.predict(X_new)
 y_proba.round(2)
 
+print('PREDICT CLASSES')
 y_pred = model.predict_classes(X_new)
 print(y_pred)
 print(np.array(class_names)[y_pred])
