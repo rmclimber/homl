@@ -50,7 +50,7 @@ model.compile(loss="sparse_categorical_crossentropy",
               metrics=["accuracy"])
 
 ## TRAIN MODEL
-history = model.fit(X_train, y_train, epochs=30,
+history = model.fit(X_train, y_train, epochs=1,
                     validation_data=(X_val, y_val))
 
 # if not satisfied with performance, can all fit() again
@@ -84,3 +84,36 @@ print(y_pred)
 print(np.array(class_names)[y_pred])
 y_new = ytest[:3]
 print(y_new)
+
+### Building a regression MLP (p. 307)
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+housing = fetch_california_housing()
+X_train_full, X_test, y_train_full, y_test = train_test_split(
+    housing.data, housing.target
+)
+X_train, X_val, y_train, y_val = train_test_split(
+    X_train_full, y_train_full
+)
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_val = scaler.transform(X_val)
+X_test = scaler.transform(X_test)
+
+print(X_train.shape)
+
+model = keras.models.Sequential([
+    keras.layers.Dense(30, activation='relu', input_shape=X_train.shape[1:]),
+    keras.layers.Dense(1)
+])
+model.compile(loss='mean_squared_error', optimizer='sgd')
+history = model.fit(X_train, y_train, epochs=20,
+                    validation_data=(X_val, y_val))
+mse_teset = model.evaluate(X_test, y_test)
+X_new = X_test[:3]
+y_pred = model.predict(X_new)
+
+
