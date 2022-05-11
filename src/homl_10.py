@@ -110,10 +110,12 @@ model = keras.models.Sequential([
     keras.layers.Dense(1)
 ])
 model.compile(loss='mean_squared_error', optimizer='sgd')
-history = model.fit(X_train, y_train, epochs=20,
+history = model.fit(X_train, y_train, epochs=1,
                     validation_data=(X_val, y_val))
 mse_teset = model.evaluate(X_test, y_test)
 X_new = X_test[:3]
 y_pred = model.predict(X_new)
+print(y_test[:3])
+print(y_pred)
 
 
