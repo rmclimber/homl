@@ -119,3 +119,53 @@ print(y_test[:3])
 print(y_pred)
 
 
+# This is the Functional API (layers are called like functions and passed their input layer)
+input_ = keras.layers.Input(shape=X_train.shape[1:])
+hidden1 = keras.layers.Dense(30, activation='relu')(input_)
+hidden2 = keras.layers.Dense(30, activation='relu')(hidden1)
+concat = keras.layers.Concatenate()([input_, hidden2])
+output = keras.layers.Dense(1)(concat)
+model = keras.Model(inputs=[input_], outputs=[output])
+
+## CREATE WIDE AND DEEP NET 308-309
+input_A = keras.layers.Input(shape=[5], name="wide_input")
+input_B = keras.layers.Input(shape=[6], name="deep_input")
+hidden1 = keras.layers.Dense(30, activation="relu")(input_B)
+hidden2 = keras.layers.Dense(30, activation="relu")(hidden1)
+concat = keras.layers.concatenate([input_A, hidden2])
+output = keras.layers.Dense(1, name="output")(concat)
+# at this point, a second output could be added if we wanted
+model = keras.Model(input=[input_A, input_B], outputs=[output])
+model.compile(loss="mse", optimizer=keras.optimizers.SGD(lr=1e-3))
+
+# to use this new model, have to pass it two input matrices
+X_train_A, X_train_B = X_train[:, :5], X_train[:, 2:]
+X_valid_A, X_valid_B = X_val[:, :5], X_val[:, 2:]
+X_test_A, X_test_B = X_test[:, :5], X_test[:, 2:]
+X_new_A, X_new_B = X_test_A[:3], X_test_B[:3]
+
+history = model.fit((X_train_A, X_train_B), y_train, epochs=20,
+                    validation_data=((X_valid_A, X_valid_B), y_val))
+mse_test = model.evaluate((X_test_A, X_test_B), y_test)
+y_pred = model.predict((X_new_A, X_new_B))
+
+# can send subset of features through wide path and other subset through deep path (p. 310)
+# primary difference is that we must pass pair of matrices to train(), fit(), predict()
+# also need to name the input layers, so that dict can be used to pass inputs
+
+# use cases: finding location of main object (classification = main object, regression = coords)
+# use cases: multitask classification: one to identify whether wearing glasses, another to ID whether smiling
+# use case: regularization
+
+## SUBCLASSING API
+# models can be subclassed using the Sublcassing API
+# Keras models can be used just like regular layers
+
+
+# can save Sequential/Functional API model with model.save('filename.h5'); load_model('filename.h5') to get it up andn running
+# ^ cannot save subclassed model`
+
+# callbacks can be used to save history at various points, by passingn array of callbacks to callbacks parameter
+
+
+# deep neural nets can use exponentiailly fewer neurons to model complex phenomena
