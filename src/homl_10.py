@@ -160,6 +160,37 @@ y_pred = model.predict((X_new_A, X_new_B))
 ## SUBCLASSING API
 # models can be subclassed using the Sublcassing API
 # Keras models can be used just like regular layers
+class WideAndDeep(keras.Model):
+    def __init__(self, units=30, activation="relu", **kwargs):
+        super().__init__(**kwargs)
+        self.hidden1 = keras.layers.Dense(units, activation=activation)
+        self.hidden2 = keras.layers.Dense(units, activation=activation)
+        self.main_output = keras.layers.Dense(1)
+        self.aux_output = keras.layers.Dense(1)
+
+    def call(self, inputs):
+        # note that we do not immediately call the new models as functions until here
+        input_a, input_b = inputs
+        hidden1 = self.hidden1(input_b)
+        hidden2 = self.hidden2(hidden1)
+        concat = keras.layers.concatenate([input_a, hidden2])
+        main_output = self.main_output(concat)
+        aux_output = self.aux_output(hidden2)
+        return main_output, aux_output
+
+
+# saving and restoring a model with Sequential or Functional
+model = keras.models.Sequential([...])
+model.compile([...])
+model.fit([...])
+model.save([...])
+model = keras.models.load_model([...])
+
+# saving and restoring with subclassing: requires  requires load/save_weights (p. 315)
+
+# callbacks
+# fit accepts a callbacks argument---keras.callbacks.ModelCheckpoint() can be used to save checkpoints
+
 
 
 # can save Sequential/Functional API model with model.save('filename.h5'); load_model('filename.h5') to get it up andn running
