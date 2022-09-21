@@ -198,5 +198,48 @@ model = keras.models.load_model([...])
 
 # callbacks can be used to save history at various points, by passingn array of callbacks to callbacks parameter
 
+# TENSORBOARD
+## TensorBoard can be used to see results of hyperparameter tuning, is discussed 317-320
+# done as callback to fit()
 
-# deep neural nets can use exponentiailly fewer neurons to model complex phenomena
+## Using scikitlearn for hyperparam tuning
+
+def build_model(n_hidden=1, n_neurons=10, learning_rate=3e-3, input_shape=[8]):
+    model = keras.models.Sequential()
+    model.add(keras.layers.InputLayer(input_shape=input_shape))
+    for layer in range(n_hidden):
+        model.add(keras.layers.Dense(n_neurons, activation="relu"))
+    model.add(keras.layers.Dense(1))
+    optimizer = keras.optimizers.SGD(lr=learning_rate)
+    model.compile(loss="mse", optimizer=optimizer)
+    return model
+
+# wraps result of build_model into a sklearn regressor
+keras_reg = keras.wrappers.scikit_learn.KerasRegressor(build_model)
+
+keras_reg.fit(X_train, y_train, epochs=100,
+              validation_data=(X_val, y_val),
+              callbacks=[keras.callbacks.EarlyStopping(patience=10)]) # extra params here go to underlying model
+mse_test = keras_reg.score(X_test, y_test)
+y_pred = keras_reg.predict(X_new)
+
+from scipy.stats import reciprocal
+from sklearn.model_selection import RandomizedSearchCV
+
+param_distribs = {
+    "n_hidden": [0, 1, 2, 3],
+    "n_neurons": np.arange(1, 100),
+    "learning_rate": reciprocal(3e-4, 3e-2),
+}
+
+rnd_search_cv = RandomizedSearchCV(keras_reg, param_distribs, n_iter=10, cv=3)
+rnd_search_cv.fit(X_train, y_train, epochs=100,
+                  validation_data=(X_val, y_val),
+                  callbacks=[keras.callbacks.EarlyStopping(patience=10)])
+
+# p. 322 has efficient hyperparameter-tuning libraries to try
+
+
+# deep neural nets can use exponentiailly fewer neurons to model complex phenomena (323-4)
+# usually fine to use same size for each hidden layer
+# better to go too big and then use early stopping (etc) to regularize
