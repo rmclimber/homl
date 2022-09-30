@@ -44,3 +44,10 @@ model_A_clone.set_weights(model_A.get_weights())
 for layer in model_B_on_A.layers[:-1]:
     layer.trainable = False
 model_B_on_A.compile(loss="binary_crossentropy", optimizer="sgd", metrics=["accuracy"])
+
+## REGULARIZATION
+# l1 to have a sparse model; l2 to constrain weights
+layer = keras.layers.Dense(100, activation='elu',
+                           kernel_initializer='he_normal',
+                           kernel_regularizer=keras.regularizers.l2(0.01))
+# can use functools.partial to create a wrapper allowing for somem default argument-passing
