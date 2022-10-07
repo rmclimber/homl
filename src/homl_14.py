@@ -31,3 +31,38 @@ outputs = tf.nn.conv2d(images, filters, strides=1, padding="SAME")
 
 plt.imshow(outputs[0, :, :, 1], cmap="gray") # plot image1 second feature map
 plt.show()
+
+# implementing max pooling output (460)
+output = tf.nn.max_pool(images,
+                        ksize=(1, 1, 1, 3),
+                        strides=(1, 1, 1, 3),
+                        padding='valid')
+# to use max pooling as a layer
+depth_pool = keras.layers.Lambda(
+    lambda X: tf.nn.max_pool(X,
+                        ksize=(1, 1, 1, 3),
+                        strides=(1, 1, 1, 3),
+                        padding='valid')
+)
+
+# can also do global pooling, output a single number per feature map per instance
+# CNN architectures typically get smaller by deeper (more convolutional layers)
+# CNN to tackle MNIST
+model = keras.models.Sequential([
+    keras.layers.Conv2D(64, 7, activation='relu', padding='same',
+                        input_shape=(28, 28, 1)),
+    keras.layers.MaxPooling2D(2),
+    keras.layers.Conv2D(128, 3, activaiton='relu', padding='same'),
+    keras.layers.Conv2D(128, 3, activaiton='relu', padding='same'),
+    keras.layers.MaxPooling2D(2),
+    keras.layers.Conv2D(256, 3, activaiton='relu', padding='same'),
+    keras.layers.Conv2D(256, 3, activaiton='relu', padding='same'),
+    keras.layers.MaxPooling2D(2),
+    keras.layers.Flatten(),
+    keras.layers.Dense(128, activation='relu'),
+    keras.layers.Dropout(.5),
+    keras.layers.Dense(64, activation='relu'),
+    keras.layers.Dropout(.5),
+    keras.layers.Dense(10, activation='softmax')
+
+])
